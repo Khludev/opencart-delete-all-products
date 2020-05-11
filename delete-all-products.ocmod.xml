@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<modification>
+    <name>Delete All Products</name>
+    <code>Delete All Products</code>
+    <version>1.0</version>
+    <author>KU-DEV</author>
+    <link>https://ku-dev.net.ua/</link>
+    <file path="admin/view/template/catalog/product_list.tpl">
+        <operation>
+            <search>
+                <![CDATA[
+                <button type="button" data-toggle="tooltip" title="<?php echo $button_delete; ?>"
+                ]]>
+            </search>
+            <add position="after">
+                <![CDATA[
+                       <a href="<?php echo $delete_all; ?>" data-toggle="tooltip" title="Delete All Products" class="btn btn-danger"><i class="fa fa-trash-o"></i><i class="fa fa-trash-o"></i></i></a>
+		        ]]>
+            </add>
+        </operation>
+    </file>
+    <file path="admin/model/catalog/product.php">
+        <operation>
+            <search>
+                <![CDATA[
+                    public function deleteProduct
+                ]]>
+            </search>
+            <add position="before">
+                <![CDATA[
+    public function deleteAllProducts(){
+        $this->db->query("DELETE FROM " . DB_PREFIX . "product");
+        $this->db->query("DELETE FROM " . DB_PREFIX . "product_attribute");
+        $this->db->query("DELETE FROM " . DB_PREFIX . "product_description");
+        $this->db->query("DELETE FROM " . DB_PREFIX . "product_discount");
+        $this->db->query("DELETE FROM " . DB_PREFIX . "product_filter");
+        $this->db->query("DELETE FROM " . DB_PREFIX . "product_image");
+        $this->db->query("DELETE FROM " . DB_PREFIX . "product_option");
+        $this->db->query("DELETE FROM " . DB_PREFIX . "product_option_value");
+        $this->db->query("DELETE FROM " . DB_PREFIX . "product_related");
+        $this->db->query("DELETE FROM " . DB_PREFIX . "product_related");
+        $this->db->query("DELETE FROM " . DB_PREFIX . "product_reward");
+        $this->db->query("DELETE FROM " . DB_PREFIX . "product_special");
+        $this->db->query("DELETE FROM " . DB_PREFIX . "product_to_category");
+        $this->db->query("DELETE FROM " . DB_PREFIX . "product_to_download");
+        $this->db->query("DELETE FROM " . DB_PREFIX . "product_to_layout");
+        $this->db->query("DELETE FROM " . DB_PREFIX . "product_to_store");
+        $this->db->query("DELETE FROM " . DB_PREFIX . "product_recurring");
+        $this->db->query("DELETE FROM " . DB_PREFIX . "review");
+        $this->db->query("DELETE FROM " . DB_PREFIX . "url_alias");
+        $this->db->query("DELETE FROM " . DB_PREFIX . "coupon_product");
+
+        $this->cache->delete('product');
+    }
+		            ]]>
+            </add>
+        </operation>
+    </file>
+    <file path="admin/controller/catalog/product.php">
+        <operation>
+            <search>
+                <![CDATA[
+                    $data['delete'] = $this->url
+                ]]>
+            </search>
+            <add position="after">
+                <![CDATA[
+        		$data['delete_all'] = $this->url->link('catalog/product/deleteAllProducts', 'token=' . $this->session->data['token'], true);
+		            ]]>
+            </add>
+        </operation>
+        <operation>
+            <search>
+                <![CDATA[
+                    public function delete() {
+                ]]>
+            </search>
+            <add position="before">
+                <![CDATA[
+    public function deleteAllProducts() {
+        $this->load->model('catalog/product');
+        $this->model_catalog_product->deleteAllProducts();
+        $this->session->data['success'] = 'Deleted All Product Success';
+
+        $this->response->redirect($this->url->link('catalog/product', 'token=' . $this->session->data['token'], true));
+
+    }
+		            ]]>
+            </add>
+        </operation>
+    </file>
+</modification>
